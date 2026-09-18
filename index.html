@@ -73,6 +73,12 @@ label.f{display:block;font-size:12px;color:var(--tx2);margin:10px 0 4px}
 .btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
 .star{border:0;background:none;font-size:18px;color:#c9ced4;padding:0;line-height:1}
 .star.on{color:#e0a800}
+.mat{flex:0 0 auto;cursor:pointer;color:#c9ced4;font-size:15px;line-height:1.5;user-select:none;padding:0 2px}
+.mat.on{color:var(--green)}
+details.card summary{list-style:none;cursor:pointer}
+details.card summary::-webkit-details-marker{display:none}
+.copybox{display:flex;gap:8px;align-items:center;background:var(--bg);border:1px dashed var(--line);
+  border-radius:8px;padding:8px 10px;margin-top:6px;word-break:break-all}
 .empty{text-align:center;color:var(--tx3);font-size:13px;padding:24px 0}
 </style>
 </head>
@@ -95,7 +101,7 @@ label.f{display:block;font-size:12px;color:var(--tx2);margin:10px 0 4px}
   <div class="on" data-v="today"><span class="ic">◈</span>今日</div>
   <div data-v="jobs"><span class="ic">◇</span>招聘</div>
   <div data-v="exam"><span class="ic">▣</span>考公</div>
-  <div data-v="sources"><span class="ic">◎</span>来源</div>
+  <div data-v="sources"><span class="ic">◎</span>链接</div>
   <div data-v="me"><span class="ic">◐</span>我的</div>
 </nav>
 
@@ -107,6 +113,7 @@ label.f{display:block;font-size:12px;color:var(--tx2);margin:10px 0 4px}
 window.APP_DATA = {
   meta: {
     updated: "2026-09-18",
+    pageUrl: "https://200202152616.github.io/daily-job-info/",
     sourceNote: "考公信息来源为国家公务员局、各省人事考试网与组织部官方发布；标注 est 的节点为历年规律推算，官方确认后会自动去除。"
   },
 
@@ -251,6 +258,129 @@ window.APP_DATA = {
       url: "https://hrzp.bucm.edu.cn:8080/zp.html",
       source: "北京中医药大学招聘网",
       published: "2026-07"
+    }
+  ],
+
+  /* 求职材料准备（简历与投递，可勾选进度） */
+  resume: {
+    note: "投递前一次性备齐，避免临截止才发现缺盖章材料。点击左侧圆圈标记已备齐，状态存在本地。",
+    groups: [
+      {
+        name: "必备基础材料",
+        items: [
+          "中文简历（一页 A4，PDF，文件名：姓名-应聘岗位-学校）",
+          "本科 + 硕士成绩单（加盖院系或研究生院公章）",
+          "学籍在线验证报告（学信网下载）",
+          "中共党员证明（党组织关系所在单位开具，须注明入党时间）",
+          "学生干部任职证明（写明职务与起止年月，院级党政部门盖章）",
+          "校级及以上荣誉证书扫描件（北京市优秀学生干部、优秀毕业生、校长奖学金等）",
+          "英语四六级、普通话等级证书",
+          "白底 + 蓝底证件照电子版各一版（部分系统对尺寸有硬性要求）",
+          "身份证、学生证扫描件"
+        ]
+      },
+      {
+        name: "辅导员 / 高校岗专项",
+        items: [
+          "户口本首页及本人页（北京岗用于核验户籍与进京落户）",
+          "个人专业能力陈述（部分高校要求，有的要提交视频）",
+          "无犯罪记录证明",
+          "体检报告（多为拟聘后提交，提前了解医院要求）",
+          "兼职辅导员 / 班主任经历证明（如有，强加分项）",
+          "心理咨询、就业指导类培训证书（如有）"
+        ]
+      },
+      {
+        name: "简历自检要点",
+        items: [
+          "控制在一页：课题不展开，重点写学生工作与教育相关实践",
+          "辅导员岗把党员、学生干部、思政经历放最前面，用数据说话（带多少学生、办多少场活动、覆盖多少人）",
+          "教研岗突出课程设计、题库产出、用户规模等可量化结果",
+          "每句经历都能回答“然后呢 / 结果是什么”",
+          "删掉与岗位无关的填充内容，金融类实习压缩到一行",
+          "按 JD 改关键词，不一份简历投所有岗"
+        ]
+      }
+    ],
+    tips: [
+      "简历文件名用“姓名-应聘辅导员-北科大”，不要用“简历.pdf”",
+      "邮件正文写三句话：身份、匹配点、附件清单；不要空邮件只挂附件",
+      "每个岗位建一个文件夹，存投递版本与 JD 截图，面试前必翻",
+      "投北京高校岗时，在邮件里主动确认两件事：是否限京籍、是否给进京落户指标"
+    ]
+  },
+
+  /* 每日备考经验贴：每天一篇，配合当前备考阶段 */
+  articles: [
+    {
+      date: "2026-09-18",
+      title: "行测资料分析：把截位直除练到 30 秒一题",
+      tag: "行测",
+      source: "本站整理",
+      link: "https://www.scs.gov.cn",
+      points: [
+        "资料分析考的不是算得准，是算得快。截位规则：选项差距大，分母截两位；差距小，截三位",
+        "每天限时练 4 篇（每篇 5 题），25 分钟内做完，错超过 2 题就当天重做",
+        "先读题再找数据：圈出“时间、主体、单位”三个关键词，避开时间陷阱",
+        "高频陷阱：增长率与增长量混淆、百分点与百分比混淆、累计与当期混淆",
+        "公式只背四个：基期、现期、增长率、增长量；比重变化用“部分增长率 − 整体增长率”判方向"
+      ]
+    },
+    {
+      date: "2026-09-17",
+      title: "申论归纳概括：三步走找点法",
+      tag: "申论",
+      source: "本站整理",
+      link: "https://www.scs.gov.cn",
+      points: [
+        "第一步读题干：划出“作答对象”和范围限定（概括 / 归纳 / 简述，对象是谁）",
+        "第二步逐段标号，每段至少找 1 个点；盯段首段尾、观点句、对策句、“因此 / 但是”之后",
+        "第三步合并同类项，用“总括词 + 具体展开”写，一条一分，宁多勿漏",
+        "字数按每点 30–40 字估条数：要求 200 字就写 5–6 条",
+        "不要抄原句，改写成“主体 + 动作 + 结果”结构"
+      ]
+    },
+    {
+      date: "2026-09-16",
+      title: "湖南选调《综合能力测试》：公基怎么背才有效",
+      tag: "选调",
+      source: "本站整理",
+      link: "https://www.hunanpea.com",
+      points: [
+        "卷子结构：客观题以公基为主，行测只有 5 道约 4 分；主观题为综合论述 + 工作实务 + 写作",
+        "公基优先级：政治理论 > 法律 > 时政 > 省情 > 公文 > 管理 > 经济",
+        "时政只背考前 6 个月：中央一号文件、湖南省政府工作报告、乡村振兴政策",
+        "工作实务题按机关公文格式写（通知 / 倡议书 / 调研报告），格式分是白送的",
+        "每天 40 分钟：20 分钟背 + 20 分钟做 30 道选择题，错题当天回看"
+      ]
+    },
+    {
+      date: "2026-09-15",
+      title: "结构化面试：综合分析题的答题框架",
+      tag: "面试",
+      source: "本站整理",
+      link: "https://www.hunanpea.com",
+      points: [
+        "四段式：亮明观点 → 分析原因影响 → 提对策 → 落脚自身",
+        "观点要辩证但明确，不要说“我觉得都有道理”",
+        "分析用主体分析法：个人、学校、社会、政府四个维度各一句",
+        "对策要具体：“加强宣传”不如“依托学院公众号每周推一期政策解读”",
+        "选调常考基层情境：群众纠纷、防汛值守、政策落地受阻。答题体现“先稳情绪、再核事实、后按程序”"
+      ]
+    },
+    {
+      date: "2026-09-14",
+      title: "常识判断：时政如何高效积累",
+      tag: "常识",
+      source: "本站整理",
+      link: "https://www.scs.gov.cn",
+      points: [
+        "不背新闻本身，背三要素：会议名称 + 核心提法 + 时间",
+        "重点范围：二十大及历次全会、中央经济工作会议、中央一号文件、全国两会政府工作报告",
+        "湖南本地必看：省党代会、“三高四新”战略定位、省政府工作报告年度目标",
+        "碎片时间刷，每天 15 分钟，考前一周集中过一遍错题",
+        "常识性价比低，别占用资料分析、判断推理、言语理解的练习时间"
+      ]
     }
   ],
 
@@ -614,6 +744,34 @@ function jobCard(j, r, compact){
   return h;
 }
 
+function resumeMatHtml(){
+  var matDone = LS.get('matDone', []);
+  var total = 0;
+  (D.resume && D.resume.groups || []).forEach(function(g){ total += g.items.length; });
+  var h = '<div class="card"><div class="job-t">简历与材料准备</div>' +
+    '<div class="tiny" style="margin-top:2px">' + esc(D.resume.note) + '</div>' +
+    '<div class="tiny" style="margin-top:4px;color:var(--green);font-weight:600">已备齐 ' +
+      matDone.length + ' / ' + total + ' 项</div>';
+  (D.resume.groups || []).forEach(function(g, gi){
+    h += '<div class="sec-title" style="margin:12px 0 2px">' + esc(g.name) + '</div>';
+    g.items.forEach(function(it, ii){
+      var key = gi + '|' + ii;
+      var on = matDone.indexOf(key) >= 0;
+      h += '<div class="row" style="padding:3px 0;align-items:flex-start">' +
+        '<span class="mat' + (on ? ' on' : '') + '" data-mat="' + key + '">' + (on ? '●' : '○') + '</span>' +
+        '<div style="flex:1;font-size:13px;margin-left:6px' +
+        (on ? ';color:var(--tx3);text-decoration:line-through' : '') + '">' + esc(it) + '</div></div>';
+    });
+  });
+  if (D.resume.tips && D.resume.tips.length){
+    h += '<div class="sec-title" style="margin:12px 0 2px">投递提示</div><ul class="cond" style="margin:0">';
+    D.resume.tips.forEach(function(t){ h += '<li>' + esc(t) + '</li>'; });
+    h += '</ul>';
+  }
+  h += '</div>';
+  return h;
+}
+
 function renderJobs(){
   var el = document.getElementById('v-jobs');
   var list = D.jobs.map(function(j){ return { j: j, r: score(j) }; })
@@ -624,6 +782,7 @@ function renderJobs(){
     '<div class="chip" data-jf="city">仅看目标城市</div>' +
     '<div class="chip" data-jf="sal">仅看达薪资门槛</div>' +
     '<div class="chip" data-jf="fav">仅看收藏</div></div>';
+  h += resumeMatHtml();
   if (!list.length) h += '<div class="empty">暂无岗位</div>';
   list.forEach(function(x){ h += jobCard(x.j, x.r, false); });
   el.innerHTML = h;
@@ -647,6 +806,7 @@ function applyJobFilter(){
       var p = s.split(':');
       return '<div class="chip' + (jobFilter === p[0] ? ' on' : '') + '" data-jf="' + p[0] + '">' + p[1] + '</div>';
     }).join('') + '</div>';
+  h += resumeMatHtml();
   if (!list.length) h += '<div class="empty">当前筛选下没有岗位</div>';
   list.forEach(function(x){ h += jobCard(x.j, x.r, false); });
   el.innerHTML = h;
@@ -713,22 +873,86 @@ function renderExam(){
   h += '<div class="sec-title">材料清单</div><div class="card"><ul class="cond" style="margin:0">';
   D.exam.materials.forEach(function(m){ h += '<li>' + esc(m) + '</li>'; });
   h += '</ul></div>';
+
+  if (D.articles && D.articles.length){
+    var a0 = D.articles[0];
+    h += '<div class="sec-title">每日备考（每天一篇）</div>';
+    h += '<div class="card"><div class="job-t">' + esc(a0.title) + '</div>' +
+      '<div class="tiny" style="margin-top:2px">' + esc(a0.date) + ' · ' + esc(a0.tag) + ' · ' + esc(a0.source) + '</div>' +
+      '<ul class="cond" style="margin-top:6px">' +
+      a0.points.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+      (a0.link ? '<div style="margin-top:8px"><a class="link" href="' + esc(a0.link) + '" target="_blank" rel="noopener">延伸阅读</a></div>' : '') +
+      '</div>';
+    if (D.articles.length > 1){
+      h += '<div class="sec-title">往期经验贴</div>';
+      D.articles.slice(1).forEach(function(a){
+        h += '<details class="card"><summary>' +
+          '<div class="job-t">' + esc(a.title) + '</div>' +
+          '<div class="tiny">' + esc(a.date) + ' · ' + esc(a.tag) + '</div></summary>' +
+          '<ul class="cond" style="margin-top:6px">' +
+          a.points.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+          (a.link ? '<div style="margin-top:8px"><a class="link" href="' + esc(a.link) + '" target="_blank" rel="noopener">延伸阅读</a></div>' : '') +
+          '</details>';
+      });
+    }
+  }
   el.innerHTML = h;
 }
 
 function renderSources(){
   var el = document.getElementById('v-sources');
-  var h = '<div class="card"><div class="tiny">原则：聚合渠道只用于“发现”，报名、缴费、资格条件一律以官方原文为准。同一条信息在官方与第三方冲突时，取官方。</div></div>';
+  var h = '';
+  if (D.meta.pageUrl){
+    h += '<div class="card"><div class="job-t">本页网址（建议加到手机主屏）</div>' +
+      '<div class="copybox"><span style="flex:1;font-size:12px" id="pageUrl">' + esc(D.meta.pageUrl) + '</span>' +
+      '<button class="btn" data-copy="1" style="flex:0 0 auto">复制</button></div>' +
+      '<div class="tiny" style="margin-top:6px">手机浏览器打开后选“添加到主屏幕”，以后点图标直接进，不用记网址。</div></div>';
+  }
+  h += '<div class="card"><div class="tiny">原则：聚合渠道只用于“发现”，报名、缴费、资格条件一律以官方原文为准；两者冲突时取官方。</div></div>';
+
+  h += '<div class="sec-title">考公官方入口</div><div class="card">';
+  var seen = {}, idx = 0;
+  D.exam.tracks.forEach(function(t){
+    if (seen[t.official.url]) return;
+    seen[t.official.url] = 1;
+    h += '<div style="padding:9px 0' + (idx++ ? ';border-top:1px solid var(--line)' : '') + '">' +
+      '<div style="font-size:13px;font-weight:600">' + esc(t.official.name) + '</div>' +
+      '<div class="tiny">适用：' + esc(t.name) + '</div>' +
+      '<a class="link" href="' + esc(t.official.url) + '" target="_blank" rel="noopener">' + esc(t.official.url) + '</a></div>';
+  });
+  h += '</div>';
+
   (D.sources || []).forEach(function(g){
     h += '<div class="sec-title">' + esc(g.cat) + '</div><div class="card">';
     g.items.forEach(function(it, i){
       h += '<div style="padding:9px 0' + (i ? ';border-top:1px solid var(--line)' : '') + '">' +
-        '<div class="row"><div style="flex:1"><div style="font-size:13px;font-weight:600">' + esc(it.name) + '</div>' +
-        '<div class="tiny">' + esc(it.note) + '</div></div></div>' +
+        '<div style="font-size:13px;font-weight:600">' + esc(it.name) + '</div>' +
+        '<div class="tiny">' + esc(it.note) + '</div>' +
         '<a class="link" href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.url) + '</a></div>';
     });
     h += '</div>';
   });
+
+  h += '<div class="sec-title">岗位原文链接</div><div class="card">';
+  D.jobs.forEach(function(j, i){
+    h += '<div style="padding:9px 0' + (i ? ';border-top:1px solid var(--line)' : '') + '">' +
+      '<div style="font-size:13px;font-weight:600">' + esc(j.title) + '</div>' +
+      '<div class="tiny">' + esc(j.company) + ' · ' + esc(j.source) + ' · ' + esc(j.published) + '</div>' +
+      '<a class="link" href="' + esc(j.url) + '" target="_blank" rel="noopener">' + esc(j.url) + '</a></div>';
+  });
+  h += '</div>';
+
+  if (D.articles && D.articles.length){
+    h += '<div class="sec-title">经验贴与延伸阅读</div><div class="card">';
+    D.articles.forEach(function(a, i){
+      h += '<div style="padding:9px 0' + (i ? ';border-top:1px solid var(--line)' : '') + '">' +
+        '<div style="font-size:13px;font-weight:600">' + esc(a.title) + '</div>' +
+        '<div class="tiny">' + esc(a.date) + ' · ' + esc(a.tag) + ' · ' + esc(a.source) + '</div>' +
+        (a.link ? '<a class="link" href="' + esc(a.link) + '" target="_blank" rel="noopener">' + esc(a.link) + '</a>' : '') +
+        '</div>';
+    });
+    h += '</div>';
+  }
   el.innerHTML = h;
 }
 
@@ -810,6 +1034,21 @@ document.addEventListener('click', function(e){
   if (v = t.getAttribute && t.getAttribute('data-jf')){ jobFilter = v; applyJobFilter(); return; }
   if (v = t.getAttribute && t.getAttribute('data-er')){ examRegion = v; renderExam(); return; }
   if (v = t.getAttribute && t.getAttribute('data-et')){ examType = v; renderExam(); return; }
+  if (v = t.getAttribute && t.getAttribute('data-mat')){
+    var matDone = LS.get('matDone', []);
+    var k = matDone.indexOf(v);
+    if (k >= 0) matDone.splice(k, 1); else matDone.push(v);
+    LS.set('matDone', matDone);
+    applyJobFilter();
+    return;
+  }
+  if (t.getAttribute && t.getAttribute('data-copy')){
+    var u = document.getElementById('pageUrl');
+    if (u && navigator.clipboard){
+      navigator.clipboard.writeText(u.textContent).then(function(){ t.textContent = '已复制'; });
+    }
+    return;
+  }
 });
 document.addEventListener('change', function(e){
   var id = e.target.getAttribute && e.target.getAttribute('data-app');

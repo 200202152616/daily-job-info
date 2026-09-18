@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>每日就业信息</title>
+<style>
+:root{
+  --bg:#f5f6f7; --card:#ffffff; --line:#e6e8eb; --tx:#1b1d21; --tx2:#5f6368; --tx3:#8b9096;
+  --blue:#185fa5; --blue-bg:#e6f1fb; --red:#c0392b; --red-bg:#fceceb;
+  --green:#0f6e56; --green-bg:#e1f5ee; --amber:#854f0b; --amber-bg:#faeeda;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  font-size:14px;line-height:1.6;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);
+  padding:14px 16px calc(12px)}
+header h1{margin:0;font-size:16px;font-weight:600}
+header .sub{font-size:12px;color:var(--tx3);margin-top:2px}
+main{padding:12px 12px 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.sec-title{font-size:13px;font-weight:600;color:var(--tx2);margin:16px 4px 8px}
+.alert{background:var(--red-bg);border:1px solid #f2c4bf;border-radius:12px;padding:14px;margin-bottom:12px}
+.alert .tag{display:inline-block;background:var(--red);color:#fff;font-size:11px;border-radius:4px;padding:1px 6px;margin-bottom:6px}
+.alert .name{font-size:15px;font-weight:600}
+.alert .when{font-size:13px;color:var(--tx2);margin-top:4px}
+.days{font-size:26px;font-weight:700;color:var(--red);line-height:1.1}
+.days small{font-size:12px;font-weight:400;color:var(--tx2)}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.muted{color:var(--tx2);font-size:12px}
+.tiny{color:var(--tx3);font-size:11px}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:999px;background:#eef0f2;color:var(--tx2);margin:3px 4px 0 0}
+.badge.b{background:var(--blue-bg);color:var(--blue)}
+.badge.g{background:var(--green-bg);color:var(--green)}
+.badge.a{background:var(--amber-bg);color:var(--amber)}
+.badge.r{background:var(--red-bg);color:var(--red)}
+.score{font-size:12px;font-weight:600;color:var(--blue);white-space:nowrap}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;
+  padding:5px 12px;font-size:12px;color:var(--tx2)}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.timeline{margin-top:8px}
+.tl{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.tl:first-child{border-top:0}
+.tl .dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#c9ced4;margin-top:7px}
+.tl.done .dot{background:var(--green)}
+.tl.next .dot{background:var(--red)}
+.tl .body{flex:1}
+.tl .lb{font-size:13px}
+.tl.done .lb{color:var(--tx3);text-decoration:line-through}
+.tl .dt{font-size:12px;color:var(--tx2)}
+.tl .cd{font-size:11px;color:var(--red)}
+ul.cond{margin:6px 0 0;padding-left:18px}
+ul.cond li{font-size:13px;color:var(--tx2);margin-bottom:3px}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:10px}
+.tabs div{flex:1;text-align:center;padding:9px 0;font-size:13px;color:var(--tx2);border-bottom:2px solid transparent}
+.tabs div.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:30}
+.tabbar div{flex:1;text-align:center;padding:9px 0 8px;font-size:11px;color:var(--tx3)}
+.tabbar div.on{color:var(--blue)}
+.tabbar div .ic{display:block;font-size:17px;line-height:1.2}
+.hide{display:none}
+.job-t{font-size:14px;font-weight:600}
+.job-c{font-size:12px;color:var(--tx2);margin-top:1px}
+.sal{color:var(--red);font-weight:600;font-size:13px}
+.link{color:var(--blue);font-size:12px;text-decoration:none}
+select,input[type=text],input[type=number]{width:100%;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;font-size:14px;background:var(--card);color:var(--tx);font-family:inherit}
+label.f{display:block;font-size:12px;color:var(--tx2);margin:10px 0 4px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--tx)}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.star{border:0;background:none;font-size:18px;color:#c9ced4;padding:0;line-height:1}
+.star.on{color:#e0a800}
+.empty{text-align:center;color:var(--tx3);font-size:13px;padding:24px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>每日就业信息</h1>
+  <div class="sub" id="hdrSub">加载中</div>
+</header>
+
+<main>
+  <section id="v-today"></section>
+  <section id="v-jobs" class="hide"></section>
+  <section id="v-exam" class="hide"></section>
+  <section id="v-sources" class="hide"></section>
+  <section id="v-me" class="hide"></section>
+</main>
+
+<nav class="tabbar">
+  <div class="on" data-v="today"><span class="ic">◈</span>今日</div>
+  <div data-v="jobs"><span class="ic">◇</span>招聘</div>
+  <div data-v="exam"><span class="ic">▣</span>考公</div>
+  <div data-v="sources"><span class="ic">◎</span>来源</div>
+  <div data-v="me"><span class="ic">◐</span>我的</div>
+</nav>
+
+<script>
+/* 每日就业信息 · 数据层（画像：2027 届应届硕士 · 中共党员 · 主要学生干部）
+   updated: 2026-09-18
+   说明：est=true 表示依据历年规律的预测值，以官方公告为准。
+*/
+window.APP_DATA = {
+  meta: {
+    updated: "2026-09-18",
+    sourceNote: "考公信息来源为国家公务员局、各省人事考试网与组织部官方发布；标注 est 的节点为历年规律推算，官方确认后会自动去除。"
+  },
+
+  profile: {
+    degree: "硕士（2027 届应届）",
+    school: "北京科技大学 · 教育经济与管理",
+    political: "中共党员（2022 年入党）",
+    cadre: "本科院团委副书记、硕士院研究生会主席 / 校研究生执行主席",
+    birth: "2002-11-17",
+    household: "湖南户籍（非京籍）",
+    cities: ["北京", "长沙"],
+    industries: ["高等教育", "教育科技", "金融", "国企/事业单位"],
+    keywords: ["辅导员", "教研", "课程研发", "教育产品", "学生工作", "思想政治", "教育管理"],
+    salaryMin: 8
+  },
+
+  /* 资格自检：基于上述画像与现行公告口径的判定 */
+  selfCheck: [
+    {
+      name: "湖南 · 定向选调（A 类省直 / B 类市州直）",
+      verdict: "no",
+      why: "定向选调限 45 所双一流建设高校，且以硕士就读院校为准（本科 985 也不行）。北京科技大学不在该名单内。",
+      move: "放弃定向，改报常规选调"
+    },
+    {
+      name: "湖南 · 常规选调（乡镇街道，约 900 人）",
+      verdict: "ok",
+      why: "不限学校；中共党员（2022 年入党，早于公告发布日）✓；学生干部为院团委副书记、研会主席，属公告明确认可的职务且满一学年 ✓；2002 年 11 月生，远低于硕士 28 周岁线 ✓；2027 届全日制应届硕士 ✓。选调不限户籍，湖南户籍不影响报考。",
+      move: "主攻。10 月中旬公告，11 月中旬笔试"
+    },
+    {
+      name: "国家公务员考试（2027 年度）",
+      verdict: "ok",
+      why: "应届硕士年龄放宽至 40 周岁 ✓；学历达标 ✓；湖南户籍在报考注明“限本省户籍”的湖南岗位时占优。教育经济与管理一般对应教育学类/公共管理类，需以当年职位表专业目录为准。",
+      move: "10-14 职位表发布后按专业目录筛岗，限报 1 个职位"
+    },
+    {
+      name: "北京 · 定向选调 + 优培计划（2027 年度）",
+      verdict: "check",
+      why: "北京科技大学为双一流学科建设高校，其双一流建设学科为冶金、材料、矿业、科学技术史；教育经济与管理不在其中。若北科大属公告所列 43 所双一流建设高校范围，则可不限专业报考；若仅属“25 所高校双一流建设学科”通道，则本专业受限。另：京外高校非北京生源须满足校级以上荣誉奖励条件——她具备北京市优秀学生干部、北京市优秀毕业生、校长奖学金等，此项不卡。",
+      move: "报名 9-20 开始、9-23 截止，立即向校党委组织部 / 就业指导中心确认推荐名额。荣誉条件已满足，只剩“北科大是否在 43 所范围”与“专业通道”两个问题"
+    },
+    {
+      name: "北京高校辅导员 / 教育管理岗",
+      verdict: "ok",
+      why: "中共党员 ✓；硕士及以上 ✓；校院两级主要学生干部满一年 ✓（多数高校明确要求并需盖章证明）；教育经济与管理专业背景对口 ✓。短板在户籍：她是湖南户籍（非京籍），少数高校硬性要求北京市常住户口（如北京中医药大学）直接不可投；多数高校只要求“非京籍生源须符合北京市接收应届毕业生落户政策”，即录用单位得有进京指标。",
+      move: "盯各校人事处、高校人才网、北京市人社局事业单位招聘。投递前务必问清两件事：是否限京籍、是否给进京落户指标"
+    },
+    {
+      name: "湖南 · 省考（2027 年度）",
+      verdict: "ok",
+      why: "2027 届应届硕士，可在毕业当年以应届生身份报考；湖南户籍使其可报考注明“限湖南省户籍”的岗位（省内高校或本省户籍二选一的条件她以户籍满足），选择面明显大于外地考生。",
+      move: "1 月公告、3 月笔试，与选调错开，可双线准备"
+    },
+    {
+      name: "中央选调生",
+      verdict: "no",
+      why: "仅限 34 所高校（32 所 985 + 中央财经 + 中国政法）校内推荐，北科大不在名单内，无报名渠道。",
+      move: "不建议投入时间"
+    }
+  ],
+
+  /* 岗位池：与画像对口的方向（辅导员 / 教研 / 教育管理） */
+  jobs: [
+    {
+      id: "j1",
+      title: "辅导员（事业编制，5 人）",
+      company: "北京信息职业技术学院（北京市电子工业党校）",
+      nature: "事业单位 · 事业编制",
+      industry: "高等教育",
+      city: "北京",
+      salaryText: "面议（事业编制）",
+      salaryMin: null, salaryMax: null,
+      degree: "硕士研究生",
+      tags: ["事业编制", "专业不限", "1990-09-01 后出生", "第二批"],
+      desc: "2026 年 9 月第二批公开招聘辅导员岗 5 人，事业编制。专业不限，要求硕士，辅导员岗年龄 1990 年 9 月 1 日以后出生。",
+      url: "https://www.gaoxiaojob.com/job/detail/2321264.html",
+      source: "高校人才网",
+      published: "2026-09-03",
+      deadline: "2026-09-18"
+    },
+    {
+      id: "j2",
+      title: "2027 招聘（教育类岗位）",
+      company: "北京国人通教育科技有限公司",
+      nature: "民营（教育科技）",
+      industry: "教育科技",
+      city: "北京",
+      salaryText: "面议",
+      salaryMin: null, salaryMax: null,
+      degree: "本科及以上",
+      tags: ["教育服务", "校招"],
+      desc: "教育科技公司在招 2027 届岗位，具体岗位与待遇需查看原文公告。",
+      url: "https://zhiwei.yingjiesheng.com/fudaoyuan/beijing/",
+      source: "应届生求职网",
+      published: "2026-09-14"
+    },
+    {
+      id: "j3",
+      title: "教育助理",
+      company: "中国科学院科技战略咨询研究院",
+      nature: "科研院所",
+      industry: "高等教育",
+      city: "北京",
+      salaryText: "面议",
+      salaryMin: null, salaryMax: null,
+      degree: "硕士",
+      tags: ["教育管理", "科研助理"],
+      desc: "教育助理岗位，教育经济与管理、公共管理方向适配度较高。",
+      url: "https://www.gaoxiaojob.com",
+      source: "高校人才网",
+      published: "2026-08-29"
+    },
+    {
+      id: "j4",
+      title: "专职辅导员（事业编制，10 人）",
+      company: "中国地质大学（北京）",
+      nature: "事业单位 · 事业编制",
+      industry: "高等教育",
+      city: "北京",
+      salaryText: "面议（8 事业编 + 2 参编）",
+      salaryMin: null, salaryMax: null,
+      degree: "硕士研究生及以上",
+      tags: ["事业编制", "中共党员", "学生干部 1 年以上", "京户优先"],
+      desc: "专职辅导员 10 名（8 个事业编、2 个参编）。要求中共党员、高等教育阶段一年以上学生干部或兼职辅导员经历、年龄不超过 38 岁，同等条件下北京市户口优先。此为 2026 年度批次，2027 届批次预计 2026 年 10 月起陆续发布。",
+      url: "https://bj.offcn.com/html/2025/12/443888.html",
+      source: "北京中公教育（转官方公告）",
+      published: "2025-12"
+    },
+    {
+      id: "j5",
+      title: "专职辅导员（事业编制）",
+      company: "北京中医药大学",
+      nature: "事业单位 · 事业编制",
+      industry: "高等教育",
+      city: "北京",
+      salaryText: "面议（事业编制）",
+      salaryMin: null, salaryMax: null,
+      degree: "硕士研究生及以上",
+      tags: ["事业编制", "中共党员", "需北京市常住户口", "38 周岁以下"],
+      desc: "专职辅导员岗，符合国家政策的纳入事业编制。硬性要求：中共党员、硕士及以上、38 周岁及以下、**具有北京市常住户口**、非定向应届。注意户籍门槛。",
+      url: "https://hrzp.bucm.edu.cn:8080/zp.html",
+      source: "北京中医药大学招聘网",
+      published: "2026-07"
+    }
+  ],
+
+  /* 信息源：官方优先，聚合渠道用于发现，最终一律回官方核实 */
+  sources: [
+    {
+      cat: "考公官方（必看）",
+      items: [
+        { name: "国家公务员局", url: "https://www.scs.gov.cn", note: "国考公告、职位表、报名入口唯一官方渠道" },
+        { name: "湖南人事考试网", url: "https://www.hunanpea.com", note: "湖南省考与选调报名、准考证、成绩查询" },
+        { name: "湖南省人力资源和社会保障厅", url: "https://rst.hunan.gov.cn", note: "省考公告与政策文件同步发布" },
+        { name: "红星云 / 湖南省委组织部", url: "https://www.hnxw.cn", note: "选调生公告首发渠道，10 月中旬重点盯" },
+        { name: "北京市人社局人事考试频道", url: "http://rsj.beijing.gov.cn/ywsite/bjpta/", note: "北京定向选调、优培计划报名入口" },
+        { name: "北京组工（市委组织部）", url: "https://www.bjdj.gov.cn", note: "北京选调政策与录用公示" }
+      ]
+    },
+    {
+      cat: "高校辅导员 / 事业单位",
+      items: [
+        { name: "高校人才网", url: "https://www.gaoxiaojob.com", note: "高校辅导员、管理岗招聘最全聚合站，可按地区+岗位订阅" },
+        { name: "应届生求职网 · 辅导员频道", url: "https://zhiwei.yingjiesheng.com/fudaoyuan/beijing/", note: "北京辅导员岗位滚动更新" },
+        { name: "北京市人社局 · 事业单位招聘", url: "https://rsj.beijing.gov.cn", note: "市属高校、职业学院辅导员统一发布" },
+        { name: "首都之窗", url: "https://www.beijing.gov.cn", note: "北京市级事业单位招聘汇总" },
+        { name: "各高校人事处 / 人才招聘网", url: "https://www.gaoxiaojob.com", note: "北科大、北理工、北师大等校自发布，编制与落户条件差异大，须逐校看原文" }
+      ]
+    },
+    {
+      cat: "校内渠道（最关键）",
+      items: [
+        { name: "北科大就业信息网 / 研工部通知", url: "https://job.ustb.edu.cn", note: "选调推荐名额、辅导员内推、校内宣讲会通知都在这里发布" },
+        { name: "校党委组织部 / 学院党委", url: "https://job.ustb.edu.cn", note: "选调生推荐表盖章、党员证明、学生干部任职证明均需院内办理" },
+        { name: "学院辅导员 / 研究生秘书", url: "https://job.ustb.edu.cn", note: "推荐表与任职证明需提前沟通，临近截止会来不及" }
+      ]
+    },
+    {
+      cat: "聚合与提醒（第三方，需回官方核实）",
+      items: [
+        { name: "中公 / 华图 / 粉笔 公告汇总", url: "https://hn.offcn.com", note: "公告解读快，但时间与条件一律以官方原文为准" },
+        { name: "各省人事考试网导航", url: "https://www.hunanpea.com", note: "用于跨省比对，本页只维护湖南与北京" },
+        { name: "高校人才网微信公众号", url: "https://www.gaoxiaojob.com", note: "辅导员岗位推送最及时，建议开启通知" }
+      ]
+    }
+  ],
+
+  exam: {
+    tracks: [
+      {
+        id: "hunan-changgui",
+        name: "湖南 · 常规选调",
+        region: "湖南",
+        type: "选调",
+        status: "pending",
+        verdict: "ok",
+        head: "2027 届 · 约 900 人 · 乡镇街道岗位 · 不限学校",
+        official: { name: "湖南人事考试网", url: "https://www.hunanpea.com" },
+        nodes: [
+          { label: "公告发布", date: "2026-10-15", est: true, note: "省委组织部发布，同步出职位表与推荐表模板" },
+          { label: "网上报名", date: "2026-10-18", end: "2026-10-24", est: true, note: "限报 1 个，需上传盖章推荐表、党员证明、学生干部证明" },
+          { label: "资格初审", date: "2026-10-19", end: "2026-11-01", est: true },
+          { label: "笔试《综合能力测试》", date: "2026-11-16", est: true, note: "150 分钟；公基为主 + 主观题，含少量行测。长沙主考点，另设北京、上海、广州、西安等分考点" },
+          { label: "成绩公布", date: "2026-12-05", est: true },
+          { label: "结构化面试", date: "2026-12-15", est: true }
+        ],
+        conditions: [
+          "中共党员（含预备党员），入党时间须早于公告发布日，发展对象不算",
+          "学生干部任职满一学年：校/院学生会或研会主席团、各部部长副部长；校院团委书记副书记、部长副部长；班长、团支书、党支部书记",
+          "社团负责人、普通班委不认可",
+          "年龄：硕士 1998-10-16 以后出生（2026 口径），参军入伍放宽 2 岁",
+          "全日制应届，2027 年 1–7 月取得毕业证与学位证",
+          "不列入：定向委培、在职培养、独立学院、非全日制、留学生"
+        ],
+        examContent: "《综合能力测试》：客观题以公共基础知识为主（2026 年卷含 5 道行测题共 4 分），主观题为综合论述 + 工作实务 + 写作。备考重点：公基是拿分大头，实务类文章写作需专项练习，湖南省情与乡村振兴素材要积累。",
+        note: "待遇参考：硕士定级四级主任科员，一次性补助 4 万元；全省最低服务年限 5 年（含试用期），5 年内原则上不得调出湖南省外。录用后到乡镇街道工作，前 3 年到村任职不少于 2 年。"
+      },
+      {
+        id: "hunan-dingxiang",
+        name: "湖南 · 定向选调（不符合）",
+        region: "湖南",
+        type: "选调",
+        status: "closed",
+        verdict: "no",
+        head: "限 45 所双一流建设高校硕士博士 · A 类省直 100 / B 类市州直 200",
+        official: { name: "湖南人事考试网", url: "https://www.hunanpea.com" },
+        nodes: [
+          { label: "公告发布", date: "2026-10-15", est: true },
+          { label: "网上报名", date: "2026-10-18", end: "2026-10-24", est: true }
+        ],
+        conditions: [
+          "定向选调限 45 所双一流建设高校：清华、北大、人大、北航、北理工、中国农大、北师大、中央民族、南开、天大、大工、东北大学、吉大、哈工大、复旦、同济、上交、华东师大、南大、东南、浙大、中科大、厦大、山大、中国海洋、武大、华科、中南、湖大、国防科大、中山、华南理工、川大、电子科大、重大、西安交大、西北工大、西北农林、兰大、中国科学院大学、中国社会科学院大学、中国政法、中央财经、湖南师大、湘潭大学",
+          "以硕士就读院校为准，本科 985 而硕士不在名单内也无法报考",
+          "同等门槛：中共党员 + 限定学生干部，A/B 类二选一，不可与常规选调兼报"
+        ],
+        note: "北京科技大学不在名单内，此赛道排除。以当年公告附件为准，若名单调整需重新核对。"
+      },
+      {
+        id: "beijing-xuandiao",
+        name: "北京 · 定向选调 + 优培计划",
+        region: "北京",
+        type: "选调",
+        status: "urgent",
+        verdict: "check",
+        head: "2027 年度 · 750 人（定向选调 472 + 优培 278）· 资格需向学校确认",
+        official: { name: "北京市人社局人事考试频道", url: "http://rsj.beijing.gov.cn/ywsite/bjpta/" },
+        nodes: [
+          { label: "公告发布", date: "2026-09-10", done: true },
+          { label: "网上报名", date: "2026-09-20", end: "2026-09-23", note: "9:00 开始，9-23 18:00 截止，仅 4 天" },
+          { label: "资格审查查询", date: "2026-09-20", end: "2026-09-24" },
+          { label: "打印准考证", date: "2026-10-14", end: "2026-10-17" },
+          { label: "笔试《综合能力测试》", date: "2026-10-17", note: "9:00-11:30，北京/上海/武汉/广州/西安" },
+          { label: "调剂报名", date: "2026-11-02", end: "2026-11-03", est: true }
+        ],
+        conditions: [
+          "43 所双一流建设高校（所有专业可报）+ 25 所高校双一流建设学科（仅限该学科毕业生）",
+          "优培计划另含 20 所北京市属高校高精尖学科、世界前 100 境外院校回国人员",
+          "2027 年全日制应届，最高学历期间必修课无重修或补考",
+          "每人可分别报 1 个定向选调、1 个优培Ⅰ类、1 个优培Ⅱ类职位",
+          "需提交《北京市选调生推荐表》并由高校党委组织部审查推荐"
+        ],
+        examContent: "《综合能力测试》150 分钟，满分 100 分。优培Ⅱ类由用人单位自主组织，不参加统一笔试。",
+        note: "关键待确认：北科大的双一流建设学科为冶金、材料、矿业、科学技术史，教育经济与管理不在其中。若学校属 43 所范围则不受专业限制；否则该通道可能受限。报名窗口只有 4 天，务必在 9-20 前向校党委组织部或就业指导中心确认推荐资格。"
+      },
+      {
+        id: "guokao",
+        name: "国家公务员考试（国考）",
+        region: "全国",
+        type: "国考",
+        status: "pending",
+        verdict: "ok",
+        head: "2027 年度 · 中央机关及其直属机构",
+        official: { name: "国家公务员局", url: "https://www.scs.gov.cn" },
+        nodes: [
+          { label: "公告 + 职位表发布", date: "2026-10-14", est: true, note: "当天即可下载 Excel 职位表筛岗" },
+          { label: "网上报名", date: "2026-10-15", end: "2026-10-24", est: true, note: "8:00 开，10-24 18:00 截止，限报 1 个职位" },
+          { label: "报名确认与缴费", date: "2026-11-01", est: true },
+          { label: "公共科目笔试", date: "2026-11-29", est: true, note: "行测 9:00-11:00，申论 14:00-17:00" },
+          { label: "成绩查询", date: "2027-01-15", est: true },
+          { label: "面试", date: "2027-02-20", est: true }
+        ],
+        conditions: [
+          "年龄 18–35 周岁，应届硕士、博士研究生放宽至 40 周岁",
+          "大专及以上学历；专业严格按职位表执行",
+          "教育经济与管理一般对应教育学类或公共管理类，须以当年职位表专业目录为准",
+          "每人限报 1 个职位；部分岗位要求政治面貌、基层年限、户籍、资格证书"
+        ],
+        examContent: "行测六大模块（政治理论、常识判断、言语理解、数量关系、判断推理、资料分析），120 分钟，副省级 135 题、地市级与行政执法类 130 题；申论 180 分钟，归纳概括、综合分析、提出对策、贯彻执行、文章论述五类题型。",
+        note: "中共党员身份在部委与党群系统岗位中是加分项，筛岗时可优先看政治面貌要求为“中共党员”的职位，竞争比通常更低。"
+      },
+      {
+        id: "beijing-fudaoyuan",
+        name: "北京高校辅导员 / 教育管理岗",
+        region: "北京",
+        type: "高校招聘",
+        status: "open",
+        verdict: "ok",
+        head: "各校自主发布 · 全年滚动 · 9 月至次年 6 月为高峰",
+        official: { name: "高校人才网", url: "https://www.gaoxiaojob.com" },
+        nodes: [
+          { label: "2027 届批次陆续发布", date: "2026-10-01", est: true, note: "多数高校 10 月起发布次年批次，编制岗竞争激烈" },
+          { label: "市属高校统一招聘", date: "2026-11-15", est: true, note: "北京市人社局事业单位招聘专栏同步发布" },
+          { label: "春季补录批次", date: "2027-03-01", est: true }
+        ],
+        conditions: [
+          "中共党员（含预备党员）为普遍硬性要求",
+          "硕士研究生及以上学历，应届毕业生须在入职前取得双证",
+          "一年及以上学生干部或兼职辅导员经历，需院校主管部门开具并加盖公章的证明",
+          "年龄多在 29–38 周岁区间，各校不一",
+          "部分高校要求北京市常住户口（如北京中医药大学），或京户优先（如中国地质大学北京）",
+          "非京籍生源须符合北京市接收应届毕业生落户政策"
+        ],
+        note: "她的匹配度很高：党员 + 研会主席 + 教育学背景。真正卡人的是户籍与编制，投递前先看这两条。材料提前备：党员证明、学生干部任职证明（明确职务与起止年月）、盖戳成绩单。"
+      },
+      {
+        id: "hunan-shengkao",
+        name: "湖南 · 省考",
+        region: "湖南",
+        type: "省考",
+        status: "pending",
+        verdict: "ok",
+        head: "参加全国春季多省联考 · 2026 年招录 10198 人",
+        official: { name: "湖南人事考试网 / 省人社厅", url: "https://rst.hunan.gov.cn" },
+        nodes: [
+          { label: "公告 + 职位表", date: "2027-01-13", est: true },
+          { label: "网上注册报名", date: "2027-01-28", end: "2027-02-04", est: true },
+          { label: "笔试", date: "2027-03-14", est: true, note: "行测 + 申论" },
+          { label: "成绩查询", date: "2027-04-08", est: true },
+          { label: "面试", date: "2027-04-25", est: true }
+        ],
+        conditions: [
+          "需在湖南政务服务网完成实名认证",
+          "一个身份证号只能注册一次，注册信息提交后不可修改",
+          "每人限报 1 个职位"
+        ],
+        note: "与选调错开时间，可双线准备。省考岗位选择面更宽，但竞争比显著高于选调。"
+      },
+      {
+        id: "yangxuan",
+        name: "中央选调生（不符合）",
+        region: "全国",
+        type: "中央选调",
+        status: "closed",
+        verdict: "no",
+        head: "34 所高校校内推荐制 · 北科大不在名单内",
+        official: { name: "中组部下发各高校党委组织部", url: "https://www.scs.gov.cn" },
+        nodes: [
+          { label: "校内初选推荐", date: "2026-09-20", end: "2026-10-20", est: true }
+        ],
+        conditions: [
+          "仅限 34 所高校：32 所 985 + 中央财经大学 + 中国政法大学",
+          "必须中共党员 + 一年以上主要学生干部 + 校级荣誉"
+        ],
+        note: "北京科技大学无推荐名额，此赛道排除，不必投入时间。"
+      }
+    ],
+
+    pitfalls: [
+      "发展对象不等于党员：选调要求公告发布日前已成为中共党员（含预备党员），发展对象不满足",
+      "学生干部职务不在公告认可范围内：社团负责人、普通班委、就业指导中心、新媒体中心等不计入",
+      "推荐表、党员证明、学生干部证明未提前盖章，临近截止来不及",
+      "专业名称与职位表要求不一致，因院校命名差异被审核驳回",
+      "电子照片尺寸、底色、格式不合格被退回",
+      "只报名忘记缴费，等于报名作废",
+      "同时报定向与常规选调（湖南规定不可兼报）",
+      "辅导员岗忽略户籍要求，非京籍未确认落户政策就投递"
+    ],
+
+    materials: [
+      "身份证（二代）",
+      "学生证、学籍在线验证报告",
+      "加盖公章的本科与研究生成绩单",
+      "中共党员证明（党组织关系所在单位开具）",
+      "学生干部任职证明（须明确职务与任职起止年月，院级党政部门盖章）",
+      "《报名推荐表》（选调生需院系与校党委组织部盖章）",
+      "校级及以上荣誉证书（北京市优秀学生干部、优秀毕业生等）",
+      "符合规格的电子证件照片",
+      "英语四六级、普通话等级证书",
+      "辅导员岗另需：户口本首页及本人页、专业能力陈述（部分高校要求视频）"
+    ]
+  }
+};
+
+</script>
+<script>
+var D = window.APP_DATA;
+var LS = {
+  get: function(k, d){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set: function(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+var profile = LS.get('profile', D.profile);
+var favs = LS.get('favs', []);
+var apps = LS.get('apps', {});
+var examRegion = '全部';
+var examType = '全部';
+
+function today(){ var d = new Date(); d.setHours(0,0,0,0); return d; }
+function parse(s){ if(!s) return null; var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function daysTo(s){ var d = parse(s); if(!d) return null; return Math.round((d - today())/86400000); }
+function fmt(s){ if(!s) return ''; var p = s.split('-'); return (+p[1]) + '月' + (+p[2]) + '日'; }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function score(job){
+  var s = 0, rs = [];
+  var ind = profile.industries || [];
+  if (ind.indexOf(job.industry) >= 0){ s += 30; rs.push('行业对口 +30'); }
+  else rs.push('行业不符（' + job.industry + '）+0');
+  var text = (job.title + ' ' + job.desc + ' ' + (job.tags||[]).join(' ')).toUpperCase();
+  var hit = (profile.keywords || []).filter(function(k){ return text.indexOf(k.toUpperCase()) >= 0; });
+  if (hit.length){ s += 30; rs.push('命中关键词 +30：' + hit.join('、')); }
+  else rs.push('未命中关键词 +0');
+  var ct = (profile.cities || []).filter(function(c){ return job.city.indexOf(c) >= 0; });
+  if (ct.length){ s += 20; rs.push('城市匹配 +20：' + ct.join('、')); }
+  else rs.push('城市不在目标清单 +0');
+  if (job.salaryMin == null){ s += 10; rs.push('薪资面议，无法比对 +10'); }
+  else if (job.salaryMin >= (profile.salaryMin || 0)){ s += 20; rs.push('薪资达门槛 +20'); }
+  else rs.push('低于薪资门槛 +0');
+  return { s: s, rs: rs };
+}
+
+function renderToday(){
+  var el = document.getElementById('v-today');
+  var all = [];
+  D.exam.tracks.forEach(function(t){
+    if (t.verdict === 'no') return;
+    t.nodes.forEach(function(n){
+      var d = daysTo(n.date);
+      if (!n.done && d !== null && d >= 0) all.push({ t: t, n: n, d: d });
+    });
+  });
+  all.sort(function(a,b){ return a.d - b.d; });
+  var h = '';
+
+  if (all.length){
+    var x = all[0];
+    h += '<div class="alert"><span class="tag">最近截止</span>' +
+      '<div class="row"><div><div class="name">' + esc(x.t.name) + '</div>' +
+      '<div class="when">' + esc(x.n.label) + ' · ' + fmt(x.n.date) +
+      (x.n.end ? ' 至 ' + fmt(x.n.end) : '') + (x.n.est ? '（预计）' : '') + '</div></div>' +
+      '<div class="days">' + x.d + '<small> 天后</small></div></div>' +
+      (x.n.note ? '<div class="muted" style="margin-top:6px">' + esc(x.n.note) + '</div>' : '') +
+      '</div>';
+  }
+
+  var soon = all.filter(function(a){ return a.d <= 40; }).slice(1, 5);
+  if (soon.length){
+    h += '<div class="card"><div class="sec-title" style="margin:0 0 6px">40 天内的关键节点</div>';
+    soon.forEach(function(a){
+      h += '<div class="row" style="padding:5px 0;border-top:1px solid var(--line)">' +
+        '<div><div style="font-size:13px">' + esc(a.t.name) + ' · ' + esc(a.n.label) + '</div>' +
+        '<div class="tiny">' + fmt(a.n.date) + (a.n.est ? '（预计）' : '') + '</div></div>' +
+        '<div class="score">' + a.d + ' 天</div></div>';
+    });
+    h += '</div>';
+  }
+
+  var scored = D.jobs.map(function(j){ var r = score(j); return { j: j, r: r }; })
+    .sort(function(a,b){ return b.r.s - a.r.s; });
+  h += '<div class="sec-title">为你筛选的高价值岗位</div>';
+  scored.slice(0,3).forEach(function(x){ h += jobCard(x.j, x.r, true); });
+
+  h += '<div class="sec-title">我的赛道资格自检</div><div class="card">' +
+    '<div class="tiny" style="margin-bottom:4px">基于画像：' + esc(D.profile.degree) + ' · ' + esc(D.profile.political) + ' · ' + esc(D.profile.cadre) + '</div>';
+  (D.selfCheck || []).forEach(function(c, i){
+    var col = c.verdict === 'ok' ? 'g' : (c.verdict === 'check' ? 'a' : 'r');
+    var label = c.verdict === 'ok' ? '符合' : (c.verdict === 'check' ? '待确认' : '不符合');
+    h += '<div style="padding:8px 0' + (i ? ';border-top:1px solid var(--line)' : '') + '">' +
+      '<div class="row"><div style="flex:1;font-size:13px;font-weight:600">' + esc(c.name) + '</div>' +
+      '<span class="badge ' + col + '">' + label + '</span></div>' +
+      '<div class="muted" style="margin-top:3px">' + esc(c.why) + '</div>' +
+      '<div class="tiny" style="margin-top:3px">下一步：' + esc(c.move) + '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="sec-title">今日摘要</div><div class="card">' +
+    '<div class="muted">岗位库 ' + D.jobs.length + ' 条 · 考公赛道 ' + D.exam.tracks.length + ' 条 · 更新于 ' + D.meta.updated + '</div>' +
+    '<div class="tiny" style="margin-top:6px">' + esc(D.meta.sourceNote) + '</div></div>';
+  el.innerHTML = h;
+}
+
+function jobCard(j, r, compact){
+  var on = favs.indexOf(j.id) >= 0;
+  var h = '<div class="card"><div class="row">' +
+    '<div style="flex:1"><div class="job-t">' + esc(j.title) + '</div>' +
+    '<div class="job-c">' + esc(j.company) + ' · ' + esc(j.nature) + '</div>' +
+    '<div class="job-c"><span class="sal">' + esc(j.salaryText) + '</span> · ' + esc(j.city) + ' · ' + esc(j.degree) + '</div>' +
+    (j.deadline ? '<div class="tiny" style="color:var(--red)">报名截止 ' + fmt(j.deadline) + '（还有 ' + daysTo(j.deadline) + ' 天）</div>' : '') +
+    '</div>' +
+    '<div style="text-align:right"><button class="star' + (on ? ' on' : '') + '" data-fav="' + j.id + '">' + (on ? '★' : '☆') + '</button>' +
+    '<div class="score">匹配 ' + r.s + '</div></div></div>';
+  (j.tags || []).forEach(function(t){ h += '<span class="badge">' + esc(t) + '</span>'; });
+  if (j.industry) h += '<span class="badge b">' + esc(j.industry) + '</span>';
+  if (!compact){
+    h += '<div class="muted" style="margin-top:8px">' + esc(j.desc) + '</div>';
+    h += '<div class="tiny" style="margin-top:8px">评分依据：' + r.rs.map(esc).join('；') + '</div>';
+    h += '<div class="row" style="margin-top:10px;align-items:center">' +
+      '<a class="link" href="' + esc(j.url) + '" target="_blank" rel="noopener">查看原文（' + esc(j.source) + ' · ' + esc(j.published) + '）</a>' +
+      '<select data-app="' + j.id + '" style="width:auto;font-size:12px;padding:5px 8px">' +
+      ['未投递','已投递','笔试','面试','offer','已放弃'].map(function(s){
+        return '<option' + ((apps[j.id] || '未投递') === s ? ' selected' : '') + '>' + s + '</option>';
+      }).join('') + '</select></div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function renderJobs(){
+  var el = document.getElementById('v-jobs');
+  var list = D.jobs.map(function(j){ return { j: j, r: score(j) }; })
+    .sort(function(a,b){ return b.r.s - a.r.s; });
+  var h = '<div class="chips">' +
+    '<div class="chip on" data-jf="all">全部</div>' +
+    '<div class="chip" data-jf="hit">仅看命中关键词</div>' +
+    '<div class="chip" data-jf="city">仅看目标城市</div>' +
+    '<div class="chip" data-jf="sal">仅看达薪资门槛</div>' +
+    '<div class="chip" data-jf="fav">仅看收藏</div></div>';
+  if (!list.length) h += '<div class="empty">暂无岗位</div>';
+  list.forEach(function(x){ h += jobCard(x.j, x.r, false); });
+  el.innerHTML = h;
+}
+
+var jobFilter = 'all';
+function applyJobFilter(){
+  var el = document.getElementById('v-jobs');
+  var list = D.jobs.map(function(j){ return { j: j, r: score(j) }; });
+  var text, kw = (profile.keywords || []);
+  list = list.filter(function(x){
+    text = (x.j.title + ' ' + x.j.desc + ' ' + (x.j.tags||[]).join(' ')).toUpperCase();
+    if (jobFilter === 'hit') return kw.some(function(k){ return text.indexOf(k.toUpperCase()) >= 0; });
+    if (jobFilter === 'city') return (profile.cities||[]).some(function(c){ return x.j.city.indexOf(c) >= 0; });
+    if (jobFilter === 'sal') return x.j.salaryMin != null && x.j.salaryMin >= (profile.salaryMin||0);
+    if (jobFilter === 'fav') return favs.indexOf(x.j.id) >= 0;
+    return true;
+  }).sort(function(a,b){ return b.r.s - a.r.s; });
+  var h = '<div class="chips">' +
+    ['all:全部','hit:仅看命中关键词','city:仅看目标城市','sal:仅看达薪资门槛','fav:仅看收藏'].map(function(s){
+      var p = s.split(':');
+      return '<div class="chip' + (jobFilter === p[0] ? ' on' : '') + '" data-jf="' + p[0] + '">' + p[1] + '</div>';
+    }).join('') + '</div>';
+  if (!list.length) h += '<div class="empty">当前筛选下没有岗位</div>';
+  list.forEach(function(x){ h += jobCard(x.j, x.r, false); });
+  el.innerHTML = h;
+}
+
+function renderExam(){
+  var el = document.getElementById('v-exam');
+  var types = ['全部'], regions = ['全部'];
+  D.exam.tracks.forEach(function(t){
+    if (types.indexOf(t.type) < 0) types.push(t.type);
+    if (regions.indexOf(t.region) < 0) regions.push(t.region);
+  });
+  var h = '<div class="chips">' + regions.map(function(r){
+    return '<div class="chip' + (examRegion === r ? ' on' : '') + '" data-er="' + r + '">' + r + '</div>';
+  }).join('') + '</div>';
+  h += '<div class="tabs">' + types.map(function(t){
+    return '<div class="' + (examType === t ? 'on' : '') + '" data-et="' + t + '">' + t + '</div>';
+  }).join('') + '</div>';
+
+  var list = D.exam.tracks.filter(function(t){
+    var okR = examRegion === '全部' || t.region === examRegion || (examRegion === '全国' && t.region === '全国');
+    var okT = examType === '全部' || t.type === examType;
+    if (examRegion !== '全部' && examRegion !== '全国') okR = t.region === examRegion;
+    return okR && okT;
+  });
+  if (!list.length) h += '<div class="empty">该组合下暂无赛道</div>';
+
+  list.forEach(function(t){
+    var urgent = t.status === 'urgent';
+    h += '<div class="card"><div class="row"><div style="flex:1">' +
+      '<div class="job-t">' + esc(t.name) + '</div>' +
+      '<div class="muted">' + esc(t.head) + '</div></div>' +
+      (t.verdict === 'ok' ? '<span class="badge g">符合</span>' :
+       t.verdict === 'check' ? '<span class="badge a">待确认</span>' :
+       '<span class="badge">不符合</span>') + '</div>';
+    h += '<div class="timeline">';
+    var pendingFound = false;
+    t.nodes.forEach(function(n){
+      var d = daysTo(n.date);
+      var cls = n.done ? 'done' : (!pendingFound && d !== null && d >= 0 ? 'next' : '');
+      if (cls === 'next') pendingFound = true;
+      h += '<div class="tl ' + cls + '"><div class="dot"></div><div class="body">' +
+        '<div class="lb">' + esc(n.label) + (n.est ? ' <span class="tiny">预计</span>' : '') + '</div>' +
+        '<div class="dt">' + fmt(n.date) + (n.end ? ' – ' + fmt(n.end) : '') + '</div>' +
+        (n.done ? '' : (d !== null && d >= 0 ? '<div class="cd">还有 ' + d + ' 天</div>' : '<div class="tiny">已过</div>')) +
+        (n.note ? '<div class="tiny">' + esc(n.note) + '</div>' : '') +
+        '</div></div>';
+    });
+    h += '</div>';
+    if (t.conditions && t.conditions.length){
+      h += '<div class="sec-title" style="margin:10px 0 2px">报考条件</div><ul class="cond">';
+      t.conditions.forEach(function(c){ h += '<li>' + esc(c) + '</li>'; });
+      h += '</ul>';
+    }
+    if (t.examContent) h += '<div class="muted" style="margin-top:8px">考试内容：' + esc(t.examContent) + '</div>';
+    if (t.note) h += '<div class="tiny" style="margin-top:8px">提示：' + esc(t.note) + '</div>';
+    h += '<div style="margin-top:10px"><a class="link" href="' + esc(t.official.url) + '" target="_blank" rel="noopener">官方入口：' + esc(t.official.name) + '</a></div>';
+    h += '</div>';
+  });
+
+  h += '<div class="sec-title">高频踩坑</div><div class="card"><ul class="cond" style="margin:0">';
+  D.exam.pitfalls.forEach(function(p){ h += '<li>' + esc(p) + '</li>'; });
+  h += '</ul></div>';
+  h += '<div class="sec-title">材料清单</div><div class="card"><ul class="cond" style="margin:0">';
+  D.exam.materials.forEach(function(m){ h += '<li>' + esc(m) + '</li>'; });
+  h += '</ul></div>';
+  el.innerHTML = h;
+}
+
+function renderSources(){
+  var el = document.getElementById('v-sources');
+  var h = '<div class="card"><div class="tiny">原则：聚合渠道只用于“发现”，报名、缴费、资格条件一律以官方原文为准。同一条信息在官方与第三方冲突时，取官方。</div></div>';
+  (D.sources || []).forEach(function(g){
+    h += '<div class="sec-title">' + esc(g.cat) + '</div><div class="card">';
+    g.items.forEach(function(it, i){
+      h += '<div style="padding:9px 0' + (i ? ';border-top:1px solid var(--line)' : '') + '">' +
+        '<div class="row"><div style="flex:1"><div style="font-size:13px;font-weight:600">' + esc(it.name) + '</div>' +
+        '<div class="tiny">' + esc(it.note) + '</div></div></div>' +
+        '<a class="link" href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.url) + '</a></div>';
+    });
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function renderMe(){
+  var el = document.getElementById('v-me');
+  var h = '<div class="card"><div class="job-t" style="margin-bottom:4px">固定画像（来自简历）</div>' +
+    '<div class="muted">' + esc(D.profile.school) + ' · ' + esc(D.profile.degree) + '</div>' +
+    '<div class="muted">' + esc(D.profile.political) + '</div>' +
+    '<div class="muted">' + esc(D.profile.cadre) + '</div>' +
+    '<div class="muted">户籍：' + esc(D.profile.household) + '</div>' +
+    '<div class="tiny" style="margin-top:4px">这几项决定选调与辅导员的报考资格，如需修改请改 data.js 中的 profile。</div></div>';
+  h += '<div class="card"><div class="job-t" style="margin-bottom:6px">筛选参数（决定岗位评分）</div>';
+  h += '<label class="f">目标城市（逗号分隔）</label><input type="text" id="pCities" value="' + esc((profile.cities||[]).join(',')) + '">';
+  h += '<label class="f">目标行业（逗号分隔）</label><input type="text" id="pInd" value="' + esc((profile.industries||[]).join(',')) + '">';
+  h += '<label class="f">岗位关键词（逗号分隔）</label><input type="text" id="pKw" value="' + esc((profile.keywords||[]).join(',')) + '">';
+  h += '<label class="f">薪资门槛（K/月）</label><input type="number" id="pSal" value="' + esc(profile.salaryMin) + '">';
+  h += '<div style="margin-top:12px"><button class="btn p" id="saveP">保存并重新筛选</button> ' +
+       '<button class="btn" id="resetP">恢复默认</button></div></div>';
+
+  var favJobs = D.jobs.filter(function(j){ return favs.indexOf(j.id) >= 0; });
+  h += '<div class="sec-title">收藏的岗位（' + favJobs.length + '）</div>';
+  if (!favJobs.length) h += '<div class="card"><div class="empty">还没有收藏</div></div>';
+  favJobs.forEach(function(j){ h += jobCard(j, score(j), false); });
+
+  var tracked = Object.keys(apps).filter(function(k){ return apps[k] && apps[k] !== '未投递'; });
+  h += '<div class="sec-title">投递跟踪（' + tracked.length + '）</div><div class="card">';
+  if (!tracked.length) h += '<div class="empty">还没有记录</div>';
+  tracked.forEach(function(id){
+    var j = D.jobs.filter(function(x){ return x.id === id; })[0];
+    if (j) h += '<div class="row" style="padding:4px 0"><div><div style="font-size:13px">' + esc(j.title) + '</div>' +
+      '<div class="tiny">' + esc(j.company) + '</div></div><span class="badge b">' + esc(apps[id]) + '</span></div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+
+  document.getElementById('saveP').onclick = function(){
+    var sp = function(v){ return v.split(/[,，]/).map(function(s){ return s.trim(); }).filter(Boolean); };
+    var base = JSON.parse(JSON.stringify(profile));
+    base.cities = sp(document.getElementById('pCities').value);
+    base.industries = sp(document.getElementById('pInd').value);
+    base.keywords = sp(document.getElementById('pKw').value);
+    base.salaryMin = +document.getElementById('pSal').value || 0;
+    profile = base;
+    LS.set('profile', profile);
+    renderAll();
+  };
+  document.getElementById('resetP').onclick = function(){
+    try{ localStorage.removeItem('profile'); }catch(e){}
+    profile = JSON.parse(JSON.stringify(D.profile));
+    renderAll();
+  };
+}
+
+function renderAll(){
+  document.getElementById('hdrSub').textContent = '数据更新于 ' + D.meta.updated + ' · 岗位 ' + D.jobs.length + ' 条';
+  renderToday(); renderJobs(); renderExam(); renderSources(); renderMe();
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target;
+  var v;
+  if (v = t.getAttribute && t.getAttribute('data-v')){
+    ['today','jobs','exam','sources','me'].forEach(function(k){
+      document.getElementById('v-' + k).classList.toggle('hide', k !== v);
+    });
+    [].forEach.call(document.querySelectorAll('.tabbar div'), function(d){
+      d.classList.toggle('on', d.getAttribute('data-v') === v);
+    });
+    window.scrollTo(0,0);
+    return;
+  }
+  if (v = t.getAttribute && t.getAttribute('data-fav')){
+    var i = favs.indexOf(v);
+    if (i >= 0) favs.splice(i,1); else favs.push(v);
+    LS.set('favs', favs);
+    renderAll();
+    return;
+  }
+  if (v = t.getAttribute && t.getAttribute('data-jf')){ jobFilter = v; applyJobFilter(); return; }
+  if (v = t.getAttribute && t.getAttribute('data-er')){ examRegion = v; renderExam(); return; }
+  if (v = t.getAttribute && t.getAttribute('data-et')){ examType = v; renderExam(); return; }
+});
+document.addEventListener('change', function(e){
+  var id = e.target.getAttribute && e.target.getAttribute('data-app');
+  if (id){ apps[id] = e.target.value; LS.set('apps', apps); renderMe(); }
+});
+
+renderAll();
+</script>
+</body>
+</html>

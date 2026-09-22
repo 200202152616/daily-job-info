@@ -38,7 +38,8 @@ main{padding:12px 12px 20px}
 .score{font-size:12px;font-weight:600;color:var(--blue);white-space:nowrap}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
 .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;
-  padding:5px 12px;font-size:12px;color:var(--tx2)}
+  padding:5px 12px;font-size:12px;color:var(--tx2);cursor:pointer;user-select:none;-webkit-user-select:none;
+  touch-action:manipulation}
 .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .timeline{margin-top:8px}
 .tl{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
@@ -54,13 +55,18 @@ main{padding:12px 12px 20px}
 ul.cond{margin:6px 0 0;padding-left:18px}
 ul.cond li{font-size:13px;color:var(--tx2);margin-bottom:3px}
 .tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:10px}
-.tabs div{flex:1;text-align:center;padding:9px 0;font-size:13px;color:var(--tx2);border-bottom:2px solid transparent}
+.tabs div{flex:1;text-align:center;padding:9px 0;font-size:13px;color:var(--tx2);border-bottom:2px solid transparent;
+  cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .tabs div.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
 .tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
   display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:30}
-.tabbar div{flex:1;text-align:center;padding:9px 0 8px;font-size:11px;color:var(--tx3)}
+.tabbar div{flex:1;text-align:center;padding:9px 0 8px;font-size:11px;color:var(--tx3);
+  cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .tabbar div.on{color:var(--blue)}
-.tabbar div .ic{display:block;font-size:17px;line-height:1.2}
+/* 图标是纯装饰，必须让它不吃点击：否则 e.target 落到 span 上取不到 data-v，点图标没反应 */
+.tabbar div .ic{display:block;font-size:17px;line-height:1.2;pointer-events:none}
+/* 点击反馈：全局关掉了 tap-highlight，这里补一个 :active，避免"点了没反应"的错觉 */
+.tabs div:active,.tabbar div:active,.chip:active{opacity:.55}
 .hide{display:none}
 .job-t{font-size:14px;font-weight:600}
 .job-c{font-size:12px;color:var(--tx2);margin-top:1px}
@@ -1039,10 +1045,19 @@ function renderAll(){
   renderToday(); renderJobs(); renderExam(); renderSources(); renderMe();
 }
 
+/* 点击可能落在子元素上（如底部导航的图标 <span>），必须从 e.target 向上
+   找最近的、带该 data-* 属性的祖先，否则点图标取不到 data-v，点了没反应。 */
+function dataUp(node, attr){
+  for (var el = node; el && el.nodeType === 1; el = el.parentElement){
+    if (el.hasAttribute(attr)) return el.getAttribute(attr);
+  }
+  return null;
+}
+
 document.addEventListener('click', function(e){
   var t = e.target;
   var v;
-  if (v = t.getAttribute && t.getAttribute('data-v')){
+  if (v = dataUp(t, 'data-v')){
     ['today','jobs','exam','sources','me'].forEach(function(k){
       document.getElementById('v-' + k).classList.toggle('hide', k !== v);
     });
@@ -1052,17 +1067,17 @@ document.addEventListener('click', function(e){
     window.scrollTo(0,0);
     return;
   }
-  if (v = t.getAttribute && t.getAttribute('data-fav')){
+  if (v = dataUp(t, 'data-fav')){
     var i = favs.indexOf(v);
     if (i >= 0) favs.splice(i,1); else favs.push(v);
     LS.set('favs', favs);
     renderAll();
     return;
   }
-  if (v = t.getAttribute && t.getAttribute('data-jf')){ jobFilter = v; applyJobFilter(); return; }
-  if (v = t.getAttribute && t.getAttribute('data-er')){ examRegion = v; renderExam(); return; }
-  if (v = t.getAttribute && t.getAttribute('data-et')){ examType = v; renderExam(); return; }
-  if (v = t.getAttribute && t.getAttribute('data-mat')){
+  if (v = dataUp(t, 'data-jf')){ jobFilter = v; applyJobFilter(); return; }
+  if (v = dataUp(t, 'data-er')){ examRegion = v; renderExam(); return; }
+  if (v = dataUp(t, 'data-et')){ examType = v; renderExam(); return; }
+  if (v = dataUp(t, 'data-mat')){
     var matDone = LS.get('matDone', []);
     var k = matDone.indexOf(v);
     if (k >= 0) matDone.splice(k, 1); else matDone.push(v);
@@ -1070,7 +1085,7 @@ document.addEventListener('click', function(e){
     applyJobFilter();
     return;
   }
-  if (t.getAttribute && t.getAttribute('data-copy')){
+  if (dataUp(t, 'data-copy')){
     var u = document.getElementById('pageUrl');
     if (u && navigator.clipboard){
       navigator.clipboard.writeText(u.textContent).then(function(){ t.textContent = '已复制'; });

@@ -111,8 +111,12 @@ details.card summary::-webkit-details-marker{display:none}
    说明：est=true 表示依据历年规律的预测值，以官方公告为准。
 */
 window.APP_DATA = {
+  /* 幂等字段说明（主任务与兜底任务共用同一份 data.js，靠这两个字段避免重复劳动）：
+     - lastFull：只有「主任务」在完成全量更新后才写，等于今天 → 主任务当天直接跳过
+     - updated  ：主任务与兜底任务都会写，页面顶部展示用，等于今天 → 兜底任务当天直接跳过 */
   meta: {
     updated: "2026-09-20",
+    lastFull: "2026-09-20",
     pageUrl: "https://200202152616.github.io/daily-job-info/",
     sourceNote: "考公信息来源为国家公务员局、各省人事考试网与组织部官方发布；标注 est 的节点为历年规律推算，官方确认后会自动去除。"
   },
